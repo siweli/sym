@@ -96,7 +96,7 @@ class AudioInterface:
     # Build the UI
 
 
-    def build_ui(self):
+    def toggle_stream(self):
         # --- Build the UI ---
         # Buttons for controlling the stream
         self.start_button = tk.Button(self.m, text="Start Stream", command=self.start_stream)
@@ -105,21 +105,36 @@ class AudioInterface:
         self.stop_button = tk.Button(self.m, text="Stop Stream", command=self.stop_stream)
         self.stop_button.grid(row=0, column=1, padx=5, pady=5)
 
-        # Gain slider
-        self.gain_label = tk.Label(self.m, text=f"Gain: {self.gain_value}")
-        self.gain_label.grid(row=1, column=0, padx=5, pady=5)
 
-        self.gain_slider = tk.Scale(self.m, from_=0, to=500, orient=tk.HORIZONTAL, command=self.update_gain)
+
+    def audio_disruptors(self):
+        # frame for the sliders
+        frame = tk.Frame(self.m)
+        frame.grid(row=1, column=0, padx=5, pady=5)
+
+        # gain slider
+        self.gain_label = tk.Label(frame, text=f"Gain: {self.gain_value}")
+        self.gain_label.grid(row=0, column=0, padx=5, pady=5)
+
+        self.gain_slider = tk.Scale(frame, from_=0, to=500, orient=tk.HORIZONTAL, command=self.update_gain)
         self.gain_slider.set(self.gain_value)
-        self.gain_slider.grid(row=1, column=1, padx=5, pady=5)
+        self.gain_slider.grid(row=0, column=1, padx=5, pady=5)
+
 
         # Bit Depth slider
-        self.bit_depth_label = tk.Label(self.m, text=f"Bit Depth: {self.bit_depth}")
-        self.bit_depth_label.grid(row=2, column=0, padx=5, pady=5)
+        self.bit_depth_label = tk.Label(frame, text=f"Bit Depth: {self.bit_depth}")
+        self.bit_depth_label.grid(row=1, column=0, padx=5, pady=5)
 
-        self.bit_depth_slider = tk.Scale(self.m, from_=2, to=16, orient=tk.HORIZONTAL, command=self.update_bit_depth)
+        self.bit_depth_slider = tk.Scale(frame, from_=2, to=16, orient=tk.HORIZONTAL, command=self.update_bit_depth)
         self.bit_depth_slider.set(self.bit_depth)
-        self.bit_depth_slider.grid(row=2, column=1, padx=5, pady=5)
+        self.bit_depth_slider.grid(row=1, column=1, padx=5, pady=5)
+
+
+
+    def build_ui(self):
+        # build functions
+        self.toggle_stream()
+        self.audio_disruptors()
 
         # Status label for stream state or errors
         self.status_label = tk.Label(self.m, text="Stream Stopped", fg="blue")
@@ -136,4 +151,3 @@ class AudioInterface:
         # Update the bit depth parameter
         self.bit_depth_value = int(value)
         self.bit_depth_label.config(text=f"Bit Depth: {self.bit_depth_value}")
-        print(f"Bit depth updated to {self.bit_depth_value}")
