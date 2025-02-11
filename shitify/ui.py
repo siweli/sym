@@ -54,7 +54,7 @@ class AudioInterface:
         )
         self.stream.start()
 
-        # Update the status label accordingly:
+        # update the status label accordingly
         self.status_label.config(text="Stream Running")
 
 
@@ -96,18 +96,17 @@ class AudioInterface:
     # Build the UI
 
 
-    def toggle_stream(self):
-        # --- Build the UI ---
-        # Buttons for controlling the stream
-        self.start_button = tk.Button(self.m, text="Start Stream", command=self.start_stream)
-        self.start_button.grid(row=0, column=0, padx=5, pady=5)
+    def create_toggle_buttons(self):
+        # toggle buttons
+        start_btn = tk.Button(self.m, text="Start Stream", command=self.start_stream)
+        start_btn.grid(row=0, column=0, padx=5, pady=5)
 
-        self.stop_button = tk.Button(self.m, text="Stop Stream", command=self.stop_stream)
-        self.stop_button.grid(row=0, column=1, padx=5, pady=5)
-
+        stop_btn = tk.Button(self.m, text="Stop Stream", command=self.stop_stream)
+        stop_btn.grid(row=0, column=1, padx=5, pady=5)
 
 
-    def audio_disruptors(self):
+
+    def create_modifier_sliders(self):
         # frame for the sliders
         frame = tk.Frame(self.m)
         frame.grid(row=1, column=0, padx=5, pady=5)
@@ -121,7 +120,7 @@ class AudioInterface:
         self.gain_slider.grid(row=0, column=1, padx=5, pady=5)
 
 
-        # Bit Depth slider
+        # bit depth slider
         self.bit_depth_label = tk.Label(frame, text=f"Bit Depth: {self.bit_depth}")
         self.bit_depth_label.grid(row=1, column=0, padx=5, pady=5)
 
@@ -133,21 +132,24 @@ class AudioInterface:
 
     def build_ui(self):
         # build functions
-        self.toggle_stream()
-        self.audio_disruptors()
+        self.create_toggle_buttons()
+        self.create_modifier_sliders()
 
-        # Status label for stream state or errors
+        # status label for stream state or errors
         self.status_label = tk.Label(self.m, text="Stream Stopped", fg="blue")
         self.status_label.grid(row=3, column=0, columnspan=2, pady=10)
 
 
+    ################################################################################
+    # Value Updates
+
 
     def update_gain(self, value):
-        # Update the gain parameter (you may need to update a global or shared variable)
+        # update gain value
         self.gain_value = float(value)
         self.gain_label.config(text=f"Gain: {self.gain_value}")
 
     def update_bit_depth(self, value):
-        # Update the bit depth parameter
+        # update bit depth
         self.bit_depth_value = int(value)
         self.bit_depth_label.config(text=f"Bit Depth: {self.bit_depth_value}")
