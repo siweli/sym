@@ -19,18 +19,6 @@ class MainApp(tk.Tk):
         self.output_device = 9
         self.samplerate = 44100
 
-        # default everything to enabled
-        self.do_loud = True
-        self.do_downsample = True
-        self.do_reduce_depth = True
-        self.do_static = True
-
-        # default values for modifiers
-        self.gain_value = 200
-        self.downsample_rate = 8000
-        self.upsample_rate = 44100
-        self.bit_depth = 2
-
         # configure layout
         self.columnconfigure(0, weight=2) # for sliders
         self.columnconfigure(1, weight=1) # for audio visualizer and gif
@@ -152,14 +140,25 @@ class MainApp(tk.Tk):
 
     def modify_audio(self, audio):
         """ Applies the selected audio modifications """
-        if self.do_loud:
-            audio = loud_mic(audio, self.gain_value)
-        if self.do_downsample:
-            audio = downsample(audio, self.downsample_rate, self.upsample_rate)
-        if self.do_reduce_depth:
-            audio = reduce_bit_depth(audio, self.bit_depth)
-        if self.do_static and np.abs(audio).mean() > 0.01:
-            audio = add_static(audio, intensity=0.2)
+        if self.audio_interface.do_gain.get():
+            gain_value = self.audio_interface.gain_slider.get()
+            audio = loud_mic(audio, gain_value)
+
+        # Downsample effect
+        if self.audio_interface.do_downsample.get():
+            audio = downsample(audio, self.audio_interface.downsample_slider.get(), 44100)
+
+        # Apply bit depth reduction if enabled in the UI
+        if self.audio_interface.do_bit_depth.get():
+            bit_depth_value = self.audio_interface.bit_depth_slider.get()
+            audio = reduce_bit_depth(audio, bit_depth_value)
+
+        # Apply static noise if enabled in the UI and there's enough signal
+        if self.audio_interface.do_static.get() and np.abs(audio).mean() > 0.01:
+            # convert the slider value into a fractional intensity
+            intensity = self.audio_interface.static_slider.get() / 100.0
+            audio = add_static(audio, intensity=intensity)
+
         return audio
 
 
