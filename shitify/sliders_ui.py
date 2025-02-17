@@ -87,10 +87,7 @@ class AudioInterface(tk.Frame):
             except ValueError:
                 new_value = default_value
             # Snap to the slider's min and max if out-of-bounds
-            if new_value < min_value:
-                new_value = min_value
-            elif new_value > max_value:
-                new_value = max_value
+            new_value = max(min(new_value, max_value), min_value)
             slider.set(new_value)
             entry.delete(0, tk.END)
             entry.insert(0, str(new_value))
