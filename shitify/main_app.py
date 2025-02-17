@@ -1,7 +1,8 @@
 import tkinter as tk
 import sounddevice as sd
 import numpy as np
-from shitify.ui import AudioInterface
+from collections import deque
+from shitify.sliders_ui import AudioInterface
 from shitify.waveform import WaveformDisplay
 from shitify.animated_gif import AnimatedGIF
 from shitify.modifiers import loud_mic, downsample, reduce_bit_depth, add_static
@@ -17,12 +18,11 @@ class MainApp(tk.Tk):
         self.output_device = 9
         self.samplerate = 44100
 
-        # default everything to enabled except audio playback
+        # default everything to enabled
         self.do_loud = True
         self.do_downsample = True
         self.do_reduce_depth = True
         self.do_static = True
-        self.playback_enabled = False
 
         # default values for modifiers
         self.gain_value = 200
@@ -51,6 +51,9 @@ class MainApp(tk.Tk):
         self.create_stream_buttons()
 
         # audio playback toggle
+        self.playback_enabled = False
+        self.playback_stream = None
+        self.playback_buffer = deque()
         self.create_playback_toggle()
 
 
@@ -84,6 +87,9 @@ class MainApp(tk.Tk):
             self.stream.start()
             self.audio_interface.status_label.config(text="Stream Running")
 
+        if self.playback_enabled and self.playback_stream is None:
+            self.start_playback_stream()
+
 
 
 
@@ -93,6 +99,12 @@ class MainApp(tk.Tk):
             self.stream.stop()
             self.stream.close()
             self.stream = None
+
+        if self.playback_stream is not None:
+            self.playback_stream.stop()
+            self.playback_stream.close()
+            self.playback_stream = None
+
         self.audio_interface.status_label.config(text="Stream Stopped")
 
 
@@ -105,9 +117,12 @@ class MainApp(tk.Tk):
         processed_audio = self.modify_audio(indata)
         outdata[:, 0] = processed_audio.flatten()
 
-        # play the audio back if it is enabled
+        # store the processed audio in the buffer for a smooth playback
         if self.playback_enabled:
-            sd.play(processed_audio, self.samplerate)
+            if np.abs(indata).mean() > 0.05:
+                self.playback_buffer.extend(processed_audio.flatten().tolist())
+            else:
+                self.playback_buffer.clear()
 
         # update the waveform display with the modified audio
         if hasattr(self, 'waveform_display'):
@@ -131,9 +146,41 @@ class MainApp(tk.Tk):
             audio = downsample(audio, self.downsample_rate, self.upsample_rate)
         if self.do_reduce_depth:
             audio = reduce_bit_depth(audio, self.bit_depth)
-        if self.do_static:
+        if self.do_static and np.abs(audio).mean() > 0.01:
             audio = add_static(audio, intensity=0.2)
         return audio
+
+
+    ####################################################################################################################################
+    # Separate stream for audio playback
+
+
+    def start_playback_stream(self):
+        """ Starts a separate non-blocking stream for real-time playback """
+        if self.playback_stream is None:
+            self.playback_stream = sd.OutputStream(
+                samplerate=self.samplerate,
+                channels=1,
+                callback=self.playback_callback
+            )
+            self.playback_stream.start()
+
+    def stop_playback_stream(self):
+        """ Stops the playback stream """
+        if self.playback_stream is not None:
+            self.playback_stream.stop()
+            self.playback_stream.close()
+            self.playback_stream = None
+
+    def playback_callback(self, outdata, frames, time, status):
+        """Continuously plays the processed audio without blocking."""
+        if len(self.playback_buffer) < frames:
+            # Not enough data: output silence
+            outdata.fill(0)
+        else:
+            # Pull 'frames' samples from the buffer
+            for i in range(frames):
+                outdata[i] = self.playback_buffer.popleft()
 
 
     ####################################################################################################################################
@@ -155,3 +202,8 @@ class MainApp(tk.Tk):
     def toggle_playback(self):
         """ Toggles audio playback on/off """
         self.playback_enabled = self.playback_var.get()
+
+        if self.playback_enabled:
+            self.start_playback_stream()
+        else:
+            self.stop_playback_stream()

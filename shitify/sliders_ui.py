@@ -8,6 +8,9 @@ class AudioInterface(tk.Frame):
         # build UI components
         self.build_ui()
 
+
+
+
     def build_ui(self):
         """ Creates UI sliders and toggle buttons for effects """
         self.grid(sticky="nsew")
@@ -15,6 +18,9 @@ class AudioInterface(tk.Frame):
         self.create_modifier_sliders()
         self.status_label = tk.Label(self, text="Stream Stopped", fg="blue")
         self.status_label.pack(pady=10)
+
+
+
 
     def create_modifier_sliders(self):
         """ Creates sliders to adjust effect parameters """
@@ -24,7 +30,7 @@ class AudioInterface(tk.Frame):
         # gain slider
         self.gain_label = tk.Label(frame, text="Gain: 200")
         self.gain_label.pack()
-        self.gain_slider = tk.Scale(frame, from_=0, to=500, orient=tk.HORIZONTAL)
+        self.gain_slider = tk.Scale(frame, from_=0, to=1000, orient=tk.HORIZONTAL)
         self.gain_slider.set(200)
         self.gain_slider.pack()
 
