@@ -3,6 +3,7 @@ newenv
 __pycache__/
 test.py
 tense sticker.png
+devices.txt
 
 build/
 dist/

@@ -51,26 +51,27 @@ class AudioInterface(tk.Frame):
         """
         frame = tk.Frame(self)
 
-        # Label with a fixed width so that all sliders line up
+        # label with a fixed width so that all sliders line up
         label = tk.Label(frame, text=label_text, width=15, anchor="w")
         label.grid(row=0, column=0, sticky="w")
 
-        # Slider with fixed length
+        # slider with fixed length
         slider = tk.Scale(frame, from_=min_value, to=max_value, orient=tk.HORIZONTAL, length=200)
         slider.set(default_value)
         slider.grid(row=0, column=1, sticky="w", padx=(5, 5))
 
-        # Entry widget to show the current value
+        # entry widget to show the current value
         entry = tk.Entry(frame, width=6)
         entry.insert(0, str(default_value))
         entry.grid(row=0, column=2, padx=(5, 5))
 
-        # Checkbox for enabling/disabling this effect
+        # checkbox for enabling/disabling this effect
         checkbox = tk.Checkbutton(frame, text="Enable", variable=enabled_var)
         checkbox.grid(row=0, column=3, padx=(5, 5))
 
-        # Callback: when slider moves, update the entry
+        # slider callback
         def slider_callback(value):
+            """ when slider moves, update the entry """
             try:
                 val = int(float(value))
             except ValueError:
@@ -80,8 +81,9 @@ class AudioInterface(tk.Frame):
 
         slider.config(command=slider_callback)
 
-        # Callback: when entry is updated (Return or focus out), update the slider
+        # entry callback
         def entry_callback(event):
+            """ when entry is updated, update the slider """
             try:
                 new_value = int(entry.get())
             except ValueError:
@@ -146,5 +148,4 @@ class AudioInterface(tk.Frame):
             enabled_var=self.do_downsample
         )
         self.downsample_frame.pack(pady=5, fill=tk.X)
-
 

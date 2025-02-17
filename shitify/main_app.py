@@ -1,6 +1,9 @@
 import tkinter as tk
 import sounddevice as sd
 import numpy as np
+from pathlib import Path
+import os
+import sys
 from collections import deque
 from shitify.sliders_ui import AudioInterface
 from shitify.waveform import WaveformDisplay
@@ -15,8 +18,8 @@ class MainApp(tk.Tk):
         self.geometry("900x500")
 
         # audio device settings
-        self.input_device = 1
-        self.output_device = 9
+        self.root_dir = self.find_exe_path()
+        self.load_config()
         self.samplerate = 44100
 
         # configure layout
@@ -53,6 +56,10 @@ class MainApp(tk.Tk):
         self.playback_stream = None
         self.playback_buffer = deque()
         self.create_playback_toggle()
+
+        # create devices dump
+        btgnt = tk.Button(self, text="Output Devices", command=self.output_devices)
+        btgnt.grid(row=989, column=99, sticky="nsew", padx=10, pady=10)
 
 
     ####################################################################################################################################
@@ -224,3 +231,48 @@ class MainApp(tk.Tk):
             self.start_playback_stream()
         else:
             self.stop_playback_stream()
+
+
+    ####################################################################################################################################
+    # Output sound devices to a txt file at root
+
+
+    def find_exe_path(self):
+        # if running as exe
+        if getattr(sys, 'frozen', False):
+            return os.path.dirname(sys.executable)
+        # running as py in dev
+        else:
+            return os.path.dirname(os.path.abspath(sys.argv[0]))
+
+
+
+
+    def load_config(self):
+        # load the config
+        cfg_path = os.path.join(self.root_dir, 'config.cfg')
+        self.input_device = None
+        self.output_device = None
+        with open(cfg_path, 'r') as f:
+            for line in f.readlines():
+                if line.startswith('input_device:'):
+                    self.input_device = line.strip().replace(' ', '').split(':')[1] # split the config line up and extract the value
+                elif line.startswith('output_device:'):
+                    self.output_device = line.strip().replace(' ', '').split(':')[1] # split the config line up and extract the value
+
+
+
+
+    def output_devices(self):
+        # dump all of 'sd.query_devices()' to an output file
+        dump_file = os.path.join(self.root_dir, 'devices.txt')
+        hostapi = [api['name'] for api in sd.query_hostapis()]
+        with open(dump_file, 'w') as f:
+            for device in sd.query_devices():
+                device_info = '|'.join([
+                    f"ID: {device['index']}",
+                    f"Name: {device['name']}",
+                    f"Host API: {hostapi[device['hostapi']]}"
+                ])
+                f.write(f'{device_info}\n')
+
