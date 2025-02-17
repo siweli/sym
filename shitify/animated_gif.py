@@ -1,9 +1,14 @@
 import tkinter as tk
+import sys
+import os
 from PIL import Image, ImageTk, ImageSequence
 
 class AnimatedGIF(tk.Label):
-    def __init__(self, master, path, delay=100):
+    def __init__(self, master, delay=100):
         super().__init__(master)
+
+        # locate the resource and load it
+        path = self.locate_resource()
         self.image = Image.open(path)
         self.frames = [
             ImageTk.PhotoImage(frame.copy().convert('RGBA'))
@@ -16,6 +21,17 @@ class AnimatedGIF(tk.Label):
         # display the first frame by default
         self.config(image=self.frames[0])
         self.grid()
+
+
+
+
+    def locate_resource(self):
+        """ Go looking for the tense gif """
+        try:
+            base_path = sys._MEIPASS
+        except Exception:
+            base_path = os.path.abspath(".")
+        return os.path.join(base_path, 'tense.gif')
 
 
 

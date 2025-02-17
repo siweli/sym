@@ -1,3 +1,9 @@
 .venv
+newenv
 __pycache__/
 test.py
+tense sticker.png
+
+build/
+dist/
+main.spec

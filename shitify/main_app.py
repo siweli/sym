@@ -41,7 +41,7 @@ class MainApp(tk.Tk):
         self.waveform_display = WaveformDisplay(self)
         self.waveform_display.grid(row=0, column=1, sticky="nsew", padx=10, pady=10)
 
-        self.animated_gif = AnimatedGIF(self, "tense.gif", 100)
+        self.animated_gif = AnimatedGIF(self, 100)
         self.animated_gif.grid(row=1, column=1, sticky="nsew", padx=10, pady=10)
 
         # stream control
