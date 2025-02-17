@@ -16,7 +16,7 @@ class AudioInterface(tk.Frame):
         self.grid(sticky="nsew")
 
         self.create_modifier_sliders()
-        self.status_label = tk.Label(self, text="Stream Stopped", fg="blue")
+        self.status_label = tk.Label(self, text="Stream Stopped", fg="#ff0000")
         self.status_label.pack(pady=10)
 
 

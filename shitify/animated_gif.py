@@ -17,11 +17,17 @@ class AnimatedGIF(tk.Label):
         self.config(image=self.frames[0])
         self.grid()
 
+
+
+
     def start(self):
         """ Start the animation if not already running """
         if not self.animation_running:
             self.animation_running = True
             self.animate()
+
+
+
 
     def animate(self):
         """ Run the GIF animation """
@@ -29,6 +35,9 @@ class AnimatedGIF(tk.Label):
             self.config(image=self.frames[self.frame_index])
             self.frame_index = (self.frame_index + 1) % len(self.frames)
             self.after(self.delay, self.animate)
+
+
+
 
     def stop(self):
         """ Freeze the GIF on the first frame when paused """

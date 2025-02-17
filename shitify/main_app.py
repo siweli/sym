@@ -6,6 +6,7 @@ from shitify.sliders_ui import AudioInterface
 from shitify.waveform import WaveformDisplay
 from shitify.animated_gif import AnimatedGIF
 from shitify.modifiers import loud_mic, downsample, reduce_bit_depth, add_static
+from shitify.themes import bg_colour_1, fg_colour
 
 class MainApp(tk.Tk):
     def __init__(self):
@@ -35,6 +36,15 @@ class MainApp(tk.Tk):
         self.columnconfigure(1, weight=1) # for audio visualizer and gif
         self.rowconfigure(0, weight=1) # audio visualizer on top
         self.rowconfigure(1, weight=1) # gif on bottom
+
+        # set colours
+        self.configure(bg=bg_colour_1)
+        self.option_add("*Background", bg_colour_1)
+        self.option_add("*Foreground", fg_colour)
+
+        # self.option_add("*Button.Background", bg_colour_1)
+        self.option_add("*Button.BorderWidth", 2)
+        self.option_add("*Button.Relief", "ridge")
 
         # UI Components
         self.audio_interface = AudioInterface(self)
@@ -86,6 +96,7 @@ class MainApp(tk.Tk):
             )
             self.stream.start()
             self.audio_interface.status_label.config(text="Stream Running")
+            self.audio_interface.status_label.config(fg="#00ff00")
 
         if self.playback_enabled and self.playback_stream is None:
             self.start_playback_stream()
@@ -106,6 +117,7 @@ class MainApp(tk.Tk):
             self.playback_stream = None
 
         self.audio_interface.status_label.config(text="Stream Stopped")
+        self.audio_interface.status_label.config(fg="#ff0000")
 
 
     ####################################################################################################################################
@@ -165,12 +177,18 @@ class MainApp(tk.Tk):
             )
             self.playback_stream.start()
 
+
+
+
     def stop_playback_stream(self):
         """ Stops the playback stream """
         if self.playback_stream is not None:
             self.playback_stream.stop()
             self.playback_stream.close()
             self.playback_stream = None
+
+
+
 
     def playback_callback(self, outdata, frames, time, status):
         """Continuously plays the processed audio without blocking."""
