@@ -256,9 +256,9 @@ class MainApp(tk.Tk):
         with open(cfg_path, 'r') as f:
             for line in f.readlines():
                 if line.startswith('input_device:'):
-                    self.input_device = line.strip().replace(' ', '').split(':')[1] # split the config line up and extract the value
+                    self.input_device = int(line.strip().replace(' ', '').split(':')[1]) # split the config line up and extract the value
                 elif line.startswith('output_device:'):
-                    self.output_device = line.strip().replace(' ', '').split(':')[1] # split the config line up and extract the value
+                    self.output_device = int(line.strip().replace(' ', '').split(':')[1]) # split the config line up and extract the value
 
 
 
