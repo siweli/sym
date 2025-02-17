@@ -29,13 +29,22 @@ def downsample(audio, downsample_rate, upsample_rate):
 
 def reduce_bit_depth(audio, bit_depth):
     """ Reduce bit depth """
-    # Assuming audio is normalized between -1 and 1.
-    levels = 2 ** bit_depth  # For 4 bits, that's 16 levels.
+    # assuming audio is normalized between -1 and 1.
+    levels = 2 ** bit_depth # 2 ** 4 = 16
 
-    # Normalize to [0, 1]
+    # normalize to [0, 1]
     audio_norm = (audio + 1) / 2
-    # Quantize to a small number of levels
+    # quantize to a small number of levels
     audio_quantized = np.floor(audio_norm * levels) / levels
-    # Convert back to [-1, 1]
+    # convert back to [-1, 1]
     audio = audio_quantized * 2 - 1
     return audio
+
+
+
+
+def add_static(audio, intensity=0.1):
+    """ Add random static noise to the audio """
+    noise = np.random.uniform(-intensity, intensity, audio.shape)
+    audio_with_static = audio + noise
+    return np.clip(audio_with_static, -1, 1)
